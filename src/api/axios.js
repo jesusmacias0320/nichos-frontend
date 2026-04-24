@@ -1,15 +1,8 @@
 import axios from 'axios';
 
-const api = axios.create({
-    baseURL: 'http://localhost:4000/api',
+const instance = axios.create({
+    baseURL: 'https://api-nichos-backend-hihx.onrender.com',
+    withCredentials: true
 });
 
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if(token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-export default api;
+export default instance;
