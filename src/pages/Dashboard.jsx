@@ -118,7 +118,7 @@ const handleCreateNiche = async (e) => {
     }
 
     try{
-      await api.put(`/niches/${selectedNiche.id}/transfer`, {
+      await api.put(`/api/niches/${selectedNiche.id}/transfer`, {
         new_owner_id: newOwnerId,
         reason: transferReason,
         deceased_name: deceasedName,
