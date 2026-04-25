@@ -44,10 +44,10 @@ const  Dashboard = () => {
         const fetchData = async () => {
             try{
               const [myRes, allRes, userRes, historyRes] = await Promise.all([
-                api.get('/niches/my-niches'),
-                api.get('/niches'),
-                api.get('/auth/users'),
-                api.get('/niches/history')
+                api.get('/api/niches/my-niches'),
+                api.get('/api/niches'),
+                api.get('/api/auth/users'),
+                api.get('/api/niches/history')
               ]);
 
               setMyNiches(myRes.data);
@@ -70,7 +70,7 @@ const handleCreateNiche = async (e) => {
     e.preventDefault();
 
     try{
-        await api.post('/niches', {code: newCode, location: newLocation});
+        await api.post('api/niches', {code: newCode, location: newLocation});
         
         await Swal.fire({
           title: '¡Nicho Creado!',
@@ -159,7 +159,7 @@ const handleCreateNiche = async (e) => {
 
       if (reason){
         try{
-        await api.put(`/niches/${niche.id}/release`, { reason: reason });
+        await api.put(`/api/niches/${niche.id}/release`, { reason: reason });
         await Swal.fire('¡Liberado!', 'El nicho ha sido vaciado correctamente.', 'success');
         window.location.reload();
 
