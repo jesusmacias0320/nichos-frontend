@@ -440,16 +440,15 @@ const handleCreateNiche = async (e) => {
                     <td className="small-text">{niche.birth_date ? niche.birth_date.split('T')[0] : '---'}</td>
                     <td className="small-text">{niche.death_date ? niche.death_date.split('T')[0] : '---'}</td>
                     <td><span className={`status-badge ${niche.status}`}>{niche.status}</span></td>
-                    <td>
-                      {niche.status === 'disponible' ? (
-                        <button className="btn-transfer" onClick={() => handleOpenTransfer(niche)}>Transferir</button>
+                    <td className="action-buttons-cell">
+                     {niche.status === 'disponible' ? (
+                       <button className="btn-transfer" onClick={() => handleOpenTransfer(niche)}>Transferir</button>
                       ) : (
-                        <button className="btn-release" onClick={() => handleReleaseNiche(niche)}>Liberar</button>
+                       <button className="btn-release" onClick={() => handleReleaseNiche(niche)}>Liberar</button>
                       )}
 
-                      <button style={{ backgroundColor: '#f59e0b', color: 'white', padding: '6px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }} 
-                        onClick={() => handleOpenEdit(niche)}>
-                          Editar
+                      <button className="btn-edit" onClick={() => handleOpenEdit(niche)}>
+                        Editar
                       </button>
                     </td>
                   </tr>
