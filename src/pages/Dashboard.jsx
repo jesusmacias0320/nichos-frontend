@@ -25,9 +25,18 @@ const  Dashboard = () => {
     const [transferReason, setTransferReason] = useState('');
 
     const [deceasedName, setDeceasedName] = useState('');
-
     const [birthDate, setBirthDate] = useState('');
     const [deathDate, setDeathDate] = useState('');
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [nicheToEdit, setNicheToEdit] = useState(null);
+    const [editFormData, setEditFormData] = useState ({
+      codigo: '',
+      ubicacion: '',
+      fallecido: '',
+      nacimiento: '',
+      defuncion: ''
+    })
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -167,6 +176,50 @@ const handleCreateNiche = async (e) => {
           Swal.fire('Error', 'hubo un problema para liberar el nicho', 'error')
         }
       } 
+  };
+
+  const handleOpenEdit = (niche) => {
+    setNicheToEdit(niche);
+    setEditFormData({
+      codigo: niche.code || '',
+      ubicacion: niche.location || '',
+      fallecido: niche.deceased_name || '',
+      nacimiento: niche.birth_date ? niche.birth_date.split('T')[0] : '',
+      defuncion: niche.death_date ? niche.death_date.split('T')[0] : ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditModalOpen(false);
+    setNicheToEdit(null);
+    setEditFormData({codigo: '', ubicacion: '', fallecido: '', nacimiento: '', defuncion: ''});
+
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    try{
+      await api.put(`/api/niches/${nicheToEdit.id}`, {
+          codigo: editFormData.codigo,
+          ubicacion: editFormData.ubicacion,
+          dueño: nicheToEdit.owner_id, 
+          fallecido: editFormData.fallecido,
+          nacimiento: editFormData.nacimiento || null,
+          defuncion: editFormData.defuncion || null
+       });
+       handleCloseEdit();
+       await Swal.fire({
+                title: '¡Actualizado!',
+                text: `Los datos del nicho han sido guardados.`,
+                icon: 'success',
+                confirmButtonColor: '#10b981'
+            });
+            window.location.reload();
+    }catch(error){
+      console.error("Error al editar", err);
+      Swal.fire('Error', 'Hubo un problema al editar el nicho.', 'error');
+    }
   };
 
   const totalNiches = allNiches.length;
@@ -393,6 +446,11 @@ const handleCreateNiche = async (e) => {
                       ) : (
                         <button className="btn-release" onClick={() => handleReleaseNiche(niche)}>Liberar</button>
                       )}
+
+                      <button style={{ backgroundColor: '#f59e0b', color: 'white', padding: '6px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }} 
+                        onClick={() => handleOpenEdit(niche)}>
+                          Editar
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -510,6 +568,84 @@ const handleCreateNiche = async (e) => {
           </div>
         </div>
       )}
+      {isEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px', width: '90%' }}>
+            <h3>Editar Nicho: {nicheToEdit?.code}</h3>
+            <p>Modifica los datos del nicho.</p>
+
+            <form onSubmit={submitEdit}>
+              <div className="form-group-flex">
+                  <div style={{ flex: 1 }}>
+                    <label>Código</label>
+                    <input 
+                      type="text" 
+                      value={editFormData.codigo} 
+                      onChange={(e) => setEditFormData({...editFormData, codigo: e.target.value})} 
+                      required 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label>Ubicación</label>
+                    <select 
+                      value={editFormData.ubicacion} 
+                      onChange={(e) => setEditFormData({...editFormData, ubicacion: e.target.value})} 
+                      required 
+                      className="form-input"
+                    >
+                        <option value="Pasillo Norte">Pasillo Norte</option>
+                        <option value="Pasillo Sur">Pasillo Sur</option>
+                        <option value="Pasillo Este">Pasillo Este</option>
+                        <option value="Pasillo Oeste">Pasillo Oeste</option>
+                        <option value="Nivel 1, Sector Jardín">Nivel 1, Sector Jardín</option>
+                        <option value="Nivel 2, Sector Jardín">Nivel 2, Sector Jardín</option>
+                        <option value="Nivel 3, Sector Jardín">Nivel 3, Sector Jardín</option>
+                    </select>
+                  </div>
+              </div>
+
+              <div className="form-group">
+                <label>Nombre del Fallecido</label>
+                <input 
+                  type="text" 
+                  value={editFormData.fallecido} 
+                  onChange={(e) => setEditFormData({...editFormData, fallecido: e.target.value})} 
+                  placeholder="Dejar en blanco si está vacío" 
+                  className="form-input" 
+                />
+              </div>
+
+              <div className="form-group-flex">
+                <div>
+                  <label>Fecha Nacimiento</label>
+                  <input 
+                    type="date" 
+                    value={editFormData.nacimiento} 
+                    onChange={(e) => setEditFormData({...editFormData, nacimiento: e.target.value})} 
+                    className="form-input" 
+                  />
+                </div>
+                <div>
+                  <label>Fecha Defunción</label>
+                  <input 
+                    type="date" 
+                    value={editFormData.defuncion} 
+                    onChange={(e) => setEditFormData({...editFormData, defuncion: e.target.value})} 
+                    className="form-input" 
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
+                <button type="button" className="btn-cancel" onClick={handleCloseEdit}>Cancelar</button>
+                <button type="submit" className="btn-confirm" style={{ backgroundColor: '#f59e0b' }}>Guardar Cambios</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div> 
   );
 };
